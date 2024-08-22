@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SKU Image Search</title>
+    <title>Pesquisa de imagem SKU</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -74,9 +74,9 @@
 </head>
 <body>
     <div class="container">
-        <h2>SKU Image Search</h2>
-        <input type="text" id="sku-input" placeholder="Enter SKU (e.g., A1349-Preto-Único)">
-        <button onclick="searchImages()">Search</button>
+        <h2>SKU ou Título Pesquisa</h2>
+        <input type="text" id="search-input" placeholder="Insira o SKU ou o título do produto">
+        <button onclick="searchItems()">Procurar</button>
         <div id="results"></div>
         <div id="no-result" class="no-result"></div>
     </div>
@@ -93,15 +93,18 @@
             })
             .catch(error => console.error('Error loading JSON data:', error));
 
-        function searchImages() {
-            const sku = document.getElementById('sku-input').value.trim().toLowerCase();
+        function searchItems() {
+            const query = document.getElementById('search-input').value.trim().toLowerCase();
             const resultsDiv = document.getElementById('results');
             const noResultDiv = document.getElementById('no-result');
             resultsDiv.innerHTML = '';
             noResultDiv.innerHTML = '';
 
-            // Find matching products
-            const matchingProducts = data.filter(item => item.SKU.toLowerCase().includes(sku));
+            // Find matching products by SKU or product title
+            const matchingProducts = data.filter(item => 
+                item.SKU.toLowerCase().includes(query) || 
+                item["产品标题"].toLowerCase().includes(query)
+            );
 
             if (matchingProducts.length > 0) {
                 matchingProducts.forEach(product => {
@@ -126,7 +129,7 @@
                     resultsDiv.appendChild(productInfo);
                 });
             } else {
-                noResultDiv.textContent = 'No images found for the given SKU.';
+                noResultDiv.textContent = 'No results found for the given query.';
             }
         }
 
