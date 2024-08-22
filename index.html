@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SKU Image Search</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .product-info {
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            cursor: pointer;
+        }
+        .product-info h3, .product-info p {
+            margin: 0;
+            padding: 5px 0;
+        }
+        .images img {
+            max-width: 100%;
+            margin-top: 10px;
+        }
+        .no-result {
+            color: red;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>SKU Image Search</h2>
+        <input type="text" id="sku-input" placeholder="Enter SKU (e.g., A1349-Preto-Único)">
+        <button onclick="searchImages()">Search</button>
+        <div id="results"></div>
+        <div id="no-result" class="no-result"></div>
+    </div>
+
+    <script>
+        let data = [];
+
+        // Load JSON data
+        fetch('products.json')
+            .then(response => response.json())
+            .then(jsonData => {
+                data = jsonData;
+                console.log('Products loaded:', data); // Debugging output
+            })
+            .catch(error => console.error('Error loading JSON data:', error));
+
+        function searchImages() {
+            const sku = document.getElementById('sku-input').value.trim().toLowerCase();
+            const resultsDiv = document.getElementById('results');
+            const noResultDiv = document.getElementById('no-result');
+            resultsDiv.innerHTML = '';
+            noResultDiv.innerHTML = '';
+
+            // Find matching products
+            const matchingProducts = data.filter(item => item.SKU.toLowerCase().includes(sku));
+
+            if (matchingProducts.length > 0) {
+                matchingProducts.forEach(product => {
+                    const productTitle = product["产品标题"];
+                    const sku = product.SKU;
+                    const productInfo = document.createElement('div');
+                    productInfo.classList.add('product-info');
+
+                    // Create and append product title
+                    const titleElement = document.createElement('h3');
+                    titleElement.textContent = `Product Title: ${productTitle}`;
+                    productInfo.appendChild(titleElement);
+
+                    // Create and append SKU
+                    const skuElement = document.createElement('p');
+                    skuElement.textContent = `SKU: ${sku}`;
+                    productInfo.appendChild(skuElement);
+
+                    // Add click event to display images
+                    productInfo.onclick = () => displayImages(product);
+
+                    resultsDiv.appendChild(productInfo);
+                });
+            } else {
+                noResultDiv.textContent = 'No images found for the given SKU.';
+            }
+        }
+
+        function displayImages(product) {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = ''; // Clear previous results
+
+            const productTitle = product["产品标题"];
+            const sku = product.SKU;
+
+            // Create and append product title
+            const titleElement = document.createElement('h3');
+            titleElement.textContent = `Product Title: ${productTitle}`;
+            resultsDiv.appendChild(titleElement);
+
+            // Create and append SKU
+            const skuElement = document.createElement('p');
+            skuElement.textContent = `SKU: ${sku}`;
+            resultsDiv.appendChild(skuElement);
+
+            // Append images
+            for (let i = 1; i <= 12; i++) {
+                const imageUrl = product[`产品图${i}`] || product[`变种图${i}`];
+                if (imageUrl) {
+                    const imgElement = document.createElement('img');
+                    imgElement.src = imageUrl;
+                    resultsDiv.appendChild(imgElement);
+                }
+            }
+        }
+    </script>
+</body>
+</html>
+
