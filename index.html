@@ -17,7 +17,7 @@
         }
         .container {
             width: 100%;
-            max-width: 600px; /* Max width to constrain layout */
+            max-width: 600px;
             padding: 20px;
             box-sizing: border-box;
             background: #fff;
@@ -28,7 +28,7 @@
             display: flex;
             align-items: center;
         }
-        input[type="text"] {
+        input[type="text"], input[type="password"] {
             flex: 1;
             padding: 10px;
             margin-right: 10px;
@@ -46,7 +46,7 @@
             background-color: #218838;
         }
         .clear-button {
-            background-color: #dc3545; /* Red color for clear button */
+            background-color: #dc3545;
             margin-left: 10px;
         }
         .clear-button:hover {
@@ -65,12 +65,12 @@
             padding: 5px 0;
         }
         .images {
-            overflow: hidden; /* Prevent overflow */
-            text-align: center; /* Center images */
+            overflow: hidden;
+            text-align: center;
         }
         .images img {
-            max-width: 100%; /* Ensure image does not exceed container width */
-            height: auto; /* Maintain aspect ratio */
+            max-width: 100%;
+            height: auto;
             margin-top: 10px;
             border-radius: 5px;
             display: block;
@@ -81,29 +81,76 @@
             color: red;
             margin-top: 10px;
         }
+        #login-form {
+            display: none;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>SKU ou Título Pesquisa</h2>
-        <div class="input-group">
-            <input type="text" id="search-input" placeholder="Insira o SKU ou o título do produto">
-            <button onclick="searchItems()">Procurar</button>
-            <button class="clear-button" onclick="clearInput()">Limpar</button>
+        <div id="login-form">
+            <h2>Login</h2>
+            <input type="text" id="username" placeholder="Username">
+            <input type="password" id="password" placeholder="Password">
+            <button onclick="login()">Login</button>
         </div>
-        <div id="results"></div>
-        <div id="no-result" class="no-result"></div>
+        <div id="main-content" style="display:none;">
+            <h2>SKU ou Título Pesquisa</h2>
+            <div class="input-group">
+                <input type="text" id="search-input" placeholder="Insira o SKU ou o título do produto">
+                <button onclick="searchItems()">Procurar</button>
+                <button class="clear-button" onclick="clearInput()">Limpar</button>
+            </div>
+            <div id="results"></div>
+            <div id="no-result" class="no-result"></div>
+        </div>
     </div>
 
     <script>
-        let data = [];
+        const validUsername = "admin";
+        const validPassword = "password123";
+        const expiryDays = 7;
+
+        function getExpiryDate() {
+            const now = new Date();
+            now.setDate(now.getDate() + expiryDays);
+            return now.getTime();
+        }
+
+        function checkLogin() {
+            const expiryDate = localStorage.getItem('expiryDate');
+            if (expiryDate && new Date().getTime() < expiryDate) {
+                document.getElementById('main-content').style.display = 'block';
+            } else {
+                document.getElementById('login-form').style.display = 'block';
+            }
+        }
+
+        function login() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+
+            if (username === validUsername && password === validPassword) {
+                localStorage.setItem('expiryDate', getExpiryDate());
+                document.getElementById('login-form').style.display = 'none';
+                document.getElementById('main-content').style.display = 'block';
+            } else {
+                alert('Invalid username or password');
+            }
+        }
+
+        function clearInput() {
+            document.getElementById('search-input').value = '';
+        }
 
         // Load JSON data
+        let data = [];
         fetch('products.json')
             .then(response => response.json())
             .then(jsonData => {
                 data = jsonData;
-                console.log('Products loaded:', data); // Debugging output
+                console.log('Products loaded:', data);
             })
             .catch(error => console.error('Error loading JSON data:', error));
 
@@ -114,7 +161,6 @@
             resultsDiv.innerHTML = '';
             noResultDiv.innerHTML = '';
 
-            // Find matching products by SKU or product title
             const matchingProducts = data.filter(item => 
                 item.SKU.toLowerCase().includes(query) || 
                 item["产品标题"].toLowerCase().includes(query)
@@ -127,17 +173,14 @@
                     const productInfo = document.createElement('div');
                     productInfo.classList.add('product-info');
 
-                    // Create and append product title
-                    const titleElement = document.createElement('h3');
-                    titleElement.textContent = `Product Title: ${productTitle}`;
+                    const titleElement = document.createElement('p');
+                    titleElement.textContent = `Título: ${productTitle}`;
                     productInfo.appendChild(titleElement);
 
-                    // Create and append SKU
-                    const skuElement = document.createElement('p');
+                    const skuElement = document.createElement('h3');
                     skuElement.textContent = `SKU: ${sku}`;
                     productInfo.appendChild(skuElement);
 
-                    // Add click event to display images
                     productInfo.onclick = () => displayImages(product);
 
                     resultsDiv.appendChild(productInfo);
@@ -149,25 +192,22 @@
 
         function displayImages(product) {
             const resultsDiv = document.getElementById('results');
-            resultsDiv.innerHTML = ''; // Clear previous results
+            resultsDiv.innerHTML = '';
 
             const productTitle = product["产品标题"];
             const sku = product.SKU;
 
-            // Create and append product title
-            const titleElement = document.createElement('h3');
+            const titleElement = document.createElement('p');
             titleElement.textContent = `Product Title: ${productTitle}`;
             resultsDiv.appendChild(titleElement);
 
-            // Create and append SKU
-            const skuElement = document.createElement('p');
+            const skuElement = document.createElement('h3');
             skuElement.textContent = `SKU: ${sku}`;
             resultsDiv.appendChild(skuElement);
 
             const imagesDiv = document.createElement('div');
             imagesDiv.classList.add('images');
             
-            // Append images
             for (let i = 1; i <= 12; i++) {
                 const imageUrl = product[`产品图${i}`] || product[`变种图${i}`];
                 if (imageUrl) {
@@ -180,9 +220,7 @@
             resultsDiv.appendChild(imagesDiv);
         }
 
-        function clearInput() {
-            document.getElementById('search-input').value = '';
-        }
+        checkLogin();
     </script>
 </body>
 </html>
