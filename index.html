@@ -7,8 +7,8 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            padding: 0;
             margin: 0;
+            padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -16,8 +16,8 @@
             background-color: #f0f0f0;
         }
         .container {
-            max-width: 600px;
             width: 100%;
+            max-width: 600px; /* Max width to constrain layout */
             padding: 20px;
             box-sizing: border-box;
             background: #fff;
@@ -53,10 +53,13 @@
             margin: 0;
             padding: 5px 0;
         }
+        .images {
+            overflow: hidden; /* Prevent overflow */
+            text-align: center; /* Center images */
+        }
         .images img {
-            max-width: 430px; /* Set the maximum width for images */
-            width: 100%; /* Ensure images scale to fit the container width */
-            height: auto;
+            max-width: 100%; /* Ensure image does not exceed container width */
+            height: auto; /* Maintain aspect ratio */
             margin-top: 10px;
             border-radius: 5px;
             display: block;
@@ -144,15 +147,20 @@
             skuElement.textContent = `SKU: ${sku}`;
             resultsDiv.appendChild(skuElement);
 
+            const imagesDiv = document.createElement('div');
+            imagesDiv.classList.add('images');
+            
             // Append images
             for (let i = 1; i <= 12; i++) {
                 const imageUrl = product[`产品图${i}`] || product[`变种图${i}`];
                 if (imageUrl) {
                     const imgElement = document.createElement('img');
                     imgElement.src = imageUrl;
-                    resultsDiv.appendChild(imgElement);
+                    imagesDiv.appendChild(imgElement);
                 }
             }
+
+            resultsDiv.appendChild(imagesDiv);
         }
     </script>
 </body>
