@@ -17,17 +17,21 @@
         }
         .container {
             width: 100%;
-            max-width: 600px;
+            max-width: 600px; /* Max width to constrain layout */
             padding: 20px;
             box-sizing: border-box;
             background: #fff;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
-        input[type="text"], input[type="password"] {
-            width: calc(100% - 22px); /* Adjusted for padding and border */
+        .input-group {
+            display: flex;
+            align-items: center;
+        }
+        input[type="text"] {
+            flex: 1;
             padding: 10px;
-            margin-bottom: 10px;
+            margin-right: 10px;
             box-sizing: border-box;
         }
         button {
@@ -48,6 +52,31 @@
         .clear-button:hover {
             background-color: #c82333;
         }
+        .product-info {
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            cursor: pointer;
+        }
+        .product-info h3, .product-info p {
+            margin: 0;
+            padding: 5px 0;
+        }
+        .images {
+            overflow: hidden; /* Prevent overflow */
+            text-align: center; /* Center images */
+        }
+        .images img {
+            max-width: 100%; /* Ensure image does not exceed container width */
+            height: auto; /* Maintain aspect ratio */
+            margin-top: 10px;
+            border-radius: 5px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
         .no-result {
             color: red;
             margin-top: 10px;
@@ -55,15 +84,7 @@
     </style>
 </head>
 <body>
-    <div class="container" id="login-container">
-        <h2>Login</h2>
-        <input type="text" id="username" placeholder="Username">
-        <input type="password" id="password" placeholder="Password">
-        <button onclick="login()">Login</button>
-        <div id="login-error" class="no-result"></div>
-    </div>
-
-    <div class="container" id="main-container" style="display:none;">
+    <div class="container">
         <h2>SKU ou Título Pesquisa</h2>
         <div class="input-group">
             <input type="text" id="search-input" placeholder="Insira o SKU ou o título do produto">
@@ -72,15 +93,10 @@
         </div>
         <div id="results"></div>
         <div id="no-result" class="no-result"></div>
-        <button onclick="logout()">Logout</button>
     </div>
 
     <script>
         let data = [];
-
-        // Dummy credentials
-        const USERNAME = "user";
-        const PASSWORD = "password";
 
         // Load JSON data
         fetch('products.json')
@@ -90,40 +106,6 @@
                 console.log('Products loaded:', data); // Debugging output
             })
             .catch(error => console.error('Error loading JSON data:', error));
-
-        function login() {
-            const username = document.getElementById('username').value.trim();
-            const password = document.getElementById('password').value.trim();
-            const loginError = document.getElementById('login-error');
-
-            if (username === USERNAME && password === PASSWORD) {
-                const now = new Date().getTime();
-                const expiryTime = now + 7 * 24 * 60 * 60 * 1000; // 7 days
-                localStorage.setItem('loginExpiry', expiryTime);
-                localStorage.setItem('isLoggedIn', true);
-                showMainContent();
-            } else {
-                loginError.textContent = 'Invalid username or password.';
-            }
-        }
-
-        function checkLoginStatus() {
-            const isLoggedIn = localStorage.getItem('isLoggedIn');
-            const expiryTime = localStorage.getItem('loginExpiry');
-            const now = new Date().getTime();
-
-            if (isLoggedIn && expiryTime && now < expiryTime) {
-                showMainContent();
-            } else {
-                localStorage.removeItem('isLoggedIn');
-                localStorage.removeItem('loginExpiry');
-            }
-        }
-
-        function showMainContent() {
-            document.getElementById('login-container').style.display = 'none';
-            document.getElementById('main-container').style.display = 'block';
-        }
 
         function searchItems() {
             const query = document.getElementById('search-input').value.trim().toLowerCase();
@@ -201,15 +183,6 @@
         function clearInput() {
             document.getElementById('search-input').value = '';
         }
-
-        function logout() {
-            localStorage.removeItem('isLoggedIn');
-            localStorage.removeItem('loginExpiry');
-            location.reload();
-        }
-
-        // Check login status on page load
-        checkLoginStatus();
     </script>
 </body>
 </html>
