@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Coleta</title>
-    <!-- 预加载 index.html -->
-    <link rel="prefetch" href="/SKU/index.html">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
@@ -45,43 +43,21 @@
             font-size: 16px;
             cursor: pointer;
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
             z-index: 1000;
             text-decoration: none;
             display: inline-block;
             text-align: center;
-            -webkit-tap-highlight-color: transparent; /* 移除移动端点击高亮 */
+        }
+
+        .nav-button:hover {
+            background: #303f9f;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.3);
         }
 
         .nav-button:active {
-            transform: scale(0.95);
-            background: #303f9f;
-        }
-
-        /* 添加加载动画 */
-        .nav-button.loading {
-            position: relative;
-            pointer-events: none;
-            opacity: 0.8;
-        }
-
-        .nav-button.loading::after {
-            content: '';
-            position: absolute;
-            width: 16px;
-            height: 16px;
-            top: 50%;
-            right: 10px;
-            transform: translateY(-50%);
-            border: 2px solid #fff;
-            border-radius: 50%;
-            border-right-color: transparent;
-            animation: rotate 0.5s linear infinite;
-        }
-
-        @keyframes rotate {
-            from { transform: translateY(-50%) rotate(0deg); }
-            to { transform: translateY(-50%) rotate(360deg); }
+            transform: translateY(0);
         }
 
         /* 数据卡片样式 */
@@ -171,9 +147,6 @@
                 font-size: 14px;
                 bottom: 15px;
                 right: 15px;
-                /* 添加硬件加速 */
-                transform: translateZ(0);
-                -webkit-transform: translateZ(0);
             }
 
             .time-info, .driver, .notice {
@@ -226,8 +199,8 @@
     </style>
 </head>
 <body>
-    <!-- 修改导航按钮 -->
-    <a href="/SKU/index.html" class="nav-button" id="navButton" onclick="handleNavigation(event)">
+    <!-- 导航按钮 -->
+    <a href="./index.html" class="nav-button" style="text-decoration: none; display: inline-block; text-align: center;">
         Codigo
     </a>
 
@@ -236,24 +209,9 @@
     </div>
 
     <script>
-        // 添加导航处理函数
-        function handleNavigation(event) {
-            event.preventDefault();
-            const button = document.getElementById('navButton');
-            button.classList.add('loading');
-            
-            // 使用 requestAnimationFrame 确保动画效果显示
-            requestAnimationFrame(() => {
-                setTimeout(() => {
-                    window.location.href = '/SKU/index.html';
-                }, 100);
-            });
-        }
-
-        // 原有的数据加载函数
         async function loadData() {
             try {
-                const response = await fetch('/SKU/data01.txt');
+                const response = await fetch('data01.txt');
                 const text = await response.text();
                 const lines = text.trim().split('\n');
                 
@@ -313,14 +271,6 @@
                 document.getElementById('container').innerHTML = '<p>Error loading data. Please try again later.</p>';
             }
         }
-
-        // 页面加载完成后预加载 index.html
-        window.addEventListener('load', () => {
-            const link = document.createElement('link');
-            link.rel = 'prefetch';
-            link.href = '/SKU/index.html';
-            document.head.appendChild(link);
-        });
 
         // 加载数据并定期刷新
         loadData();
