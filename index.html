@@ -167,45 +167,113 @@
         }
         .nav-button {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
-            padding: 15px 30px;
-            background: #3f51b5;
-            color: white;
+            bottom: 30px;
+            right: 30px;
+            padding: 0;
+            width: 120px;
+            height: 45px;
             border: none;
-            border-radius: 25px;
-            font-size: 16px;
+            border-radius: 50px;
             cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            transition: all 0.3s ease;
+            overflow: hidden;
+            transform-style: preserve-3d;
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
             z-index: 1000;
         }
 
+        .nav-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #00c6ff, #0072ff);
+            border-radius: 50px;
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            z-index: -1;
+        }
+
+        .nav-button::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            right: 2px;
+            bottom: 2px;
+            background: linear-gradient(45deg, #0072ff, #00c6ff);
+            border-radius: 48px;
+            box-shadow: 0 5px 15px rgba(0, 114, 255, 0.3);
+            z-index: -1;
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .nav-button span {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            padding: 0 20px;
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transform: translateZ(20px);
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
         .nav-button:hover {
-            background: #303f9f;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+            transform: perspective(200px) translateZ(10px) translateY(-2px);
+        }
+
+        .nav-button:hover::before {
+            transform: perspective(200px) translateZ(-10px);
+            filter: blur(20px);
+            opacity: 0.6;
+        }
+
+        .nav-button:hover::after {
+            background: linear-gradient(45deg, #00c6ff, #0072ff);
+            box-shadow: 0 8px 25px rgba(0, 114, 255, 0.4);
+        }
+
+        .nav-button:hover span {
+            letter-spacing: 2px;
         }
 
         .nav-button:active {
-            transform: translateY(0);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            transform: perspective(200px) translateZ(0) translateY(0);
         }
 
         @media (prefers-color-scheme: dark) {
-            .nav-button {
-                background: #5c6bc0;
+            .nav-button::before {
+                background: linear-gradient(45deg, #00c6ff, #0072ff);
             }
             
-            .nav-button:hover {
-                background: #3f51b5;
+            .nav-button::after {
+                background: linear-gradient(45deg, #0072ff, #00c6ff);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .nav-button {
+                bottom: 20px;
+                right: 20px;
+                width: 100px;
+                height: 40px;
+            }
+
+            .nav-button span {
+                font-size: 13px;
+                padding: 0 15px;
             }
         }
     </style>
 </head>
 <body>
     <button class="nav-button" onclick="window.location.href='index02.html'">
-        Coleta
+        <span>Coleta</span>
     </button>
     <div class="sidebar" id="sidebar">
         <!-- Navigation links will be dynamically added here -->
@@ -222,12 +290,39 @@
     <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
     <script>
         async function fetchData() {
-            const response = await fetch('https://raw.githubusercontent.com/douglas488/paomadeng2/main/data.txt?' + new Date().getTime());
+            // 尝试先从本地获取数据，如果失败则从 GitHub 获取
+            async function tryFetch(url) {
+                try {
+                    const response = await fetch(url + '?' + new Date().getTime());
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    return response;
+                } catch (error) {
+                    console.warn('Fetch failed:', error);
+                    return null;
+                }
+            }
+
+            let response;
+            
+            // 首先尝试本地文件
+            response = await tryFetch('data.txt');
+            
+            // 如果本地获取失败，尝试从 GitHub 获取
+            if (!response) {
+                response = await tryFetch('https://raw.githubusercontent.com/douglas488/paomadeng2/main/data.txt');
+            }
+            
+            if (!response) {
+                throw new Error('Failed to fetch data from both local and GitHub');
+            }
+
             const data = await response.text();
             const lines = data.trim().split('\n');
             const slidesContainer = document.getElementById('swiper-wrapper');
             const sidebar = document.getElementById('sidebar');
-            const content = document.getElementById('content');
+            
+            slidesContainer.innerHTML = '';
+            sidebar.innerHTML = '';
             
             lines.forEach((line, index) => {
                 const [first, second, third] = line.split('\t');
