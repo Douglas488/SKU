@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coleta</title>
+    <!-- 预加载 index.html -->
+    <link rel="prefetch" href="index.html">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* 基础样式 */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #f6f9fc 0%, #eef2f7 100%);
+            min-height: 100vh;
+        }
+
+        /* 容器样式 */
+        .container {
+            max-width: 600px;
+            width: 90%;
+            margin: 20px auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* 导航按钮样式 */
+        .nav-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 30px;
+            background: #3f51b5;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            transition: all 0.2s ease;
+            z-index: 1000;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            -webkit-tap-highlight-color: transparent; /* 移除移动端点击高亮 */
+        }
+
+        .nav-button:active {
+            transform: scale(0.95);
+            background: #303f9f;
+        }
+
+        /* 添加加载动画 */
+        .nav-button.loading {
+            position: relative;
+            pointer-events: none;
+            opacity: 0.8;
+        }
+
+        .nav-button.loading::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+            border: 2px solid #fff;
+            border-radius: 50%;
+            border-right-color: transparent;
+            animation: rotate 0.5s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: translateY(-50%) rotate(0deg); }
+            to { transform: translateY(-50%) rotate(360deg); }
+        }
+
+        /* 数据卡片样式 */
+        .data-section {
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            color: #1a237e;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3f51b5;
+            font-size: 1.3em;
+            letter-spacing: 0.5px;
+        }
+
+        .data-card {
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .data-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .time-info {
+            color: #3949ab;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9em;
+        }
+
+        .time-info i {
+            color: #3949ab;
+        }
+
+        .transport-info {
+            margin: 10px 0;
+        }
+
+        .company {
+            font-weight: bold;
+            color: #1a237e;
+            margin-bottom: 5px;
+            font-size: 1em;
+        }
+
+        .driver {
+            color: #5c6bc0;
+            font-size: 0.9em;
+        }
+
+        .notice {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(0, 0, 0, 0.08);
+            color: #e53935;
+            font-size: 0.9em;
+        }
+
+        /* 移动端适配 */
+        @media (max-width: 480px) {
+            .container {
+                width: 95%;
+                margin: 10px auto;
+                padding: 15px;
+            }
+
+            .data-card {
+                padding: 12px;
+            }
+
+            h2 {
+                font-size: 1.2em;
+                margin-bottom: 15px;
+            }
+
+            .nav-button {
+                padding: 12px 25px;
+                font-size: 14px;
+                bottom: 15px;
+                right: 15px;
+                /* 添加硬件加速 */
+                transform: translateZ(0);
+                -webkit-transform: translateZ(0);
+            }
+
+            .time-info, .driver, .notice {
+                font-size: 0.85em;
+            }
+
+            .company {
+                font-size: 0.95em;
+            }
+        }
+
+        /* 深色模式支持 */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background: linear-gradient(135deg, #1a1a1a 0%, #2c2c2c 100%);
+            }
+
+            .container {
+                background: rgba(30, 30, 30, 0.95);
+            }
+
+            .data-card {
+                background: #2d2d2d;
+            }
+
+            h2, .company {
+                color: #c5cae9;
+            }
+
+            .driver {
+                color: #9fa8da;
+            }
+
+            .time-info, .time-info i {
+                color: #7986cb;
+            }
+
+            .notice {
+                border-top-color: rgba(255, 255, 255, 0.08);
+            }
+
+            .nav-button {
+                background: #5c6bc0;
+            }
+            
+            .nav-button:hover {
+                background: #3f51b5;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 修改导航按钮 -->
+    <a href="index.html" class="nav-button" id="navButton" onclick="handleNavigation(event)">
+        Codigo
+    </a>
+
+    <div class="container" id="container">
+        <!-- 数据将通过 JavaScript 动态加载 -->
+    </div>
+
+    <script>
+        // 添加导航处理函数
+        function handleNavigation(event) {
+            event.preventDefault();
+            const button = document.getElementById('navButton');
+            button.classList.add('loading');
+            
+            // 使用 requestAnimationFrame 确保动画效果显示
+            requestAnimationFrame(() => {
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 100);
+            });
+        }
+
+        // 原有的数据加载函数
+        async function loadData() {
+            try {
+                const response = await fetch('data01.txt');
+                const text = await response.text();
+                const lines = text.trim().split('\n');
+                
+                const dataGroups = {};
+                
+                for (let i = 0; i < lines.length; i += 4) {
+                    if (i + 3 >= lines.length) break;
+                    
+                    const type = lines[i].split('\t')[0];
+                    const time = lines[i].split('\t')[1];
+                    const company = lines[i + 1].split('\t')[1];
+                    const driver = lines[i + 2].split('\t')[1];
+                    const notice = lines[i + 3].split('\t')[1];
+                    
+                    if (!dataGroups[type]) {
+                        dataGroups[type] = [];
+                    }
+                    
+                    dataGroups[type].push({
+                        time,
+                        company,
+                        driver,
+                        notice
+                    });
+                }
+                
+                const container = document.getElementById('container');
+                container.innerHTML = '';
+                
+                for (const [type, items] of Object.entries(dataGroups)) {
+                    const section = document.createElement('section');
+                    section.className = 'data-section';
+                    
+                    section.innerHTML = `
+                        <h2>${type}</h2>
+                        ${items.map(item => `
+                            <div class="data-card">
+                                <div class="time-info">
+                                    <i class="fas fa-clock"></i>
+                                    <span>${item.time}</span>
+                                </div>
+                                <div class="transport-info">
+                                    <p class="company">${item.company}</p>
+                                    <p class="driver">${item.driver}</p>
+                                </div>
+                                <div class="notice">
+                                    <p>${item.notice}</p>
+                                </div>
+                            </div>
+                        `).join('')}
+                    `;
+                    
+                    container.appendChild(section);
+                }
+            } catch (error) {
+                console.error('Error loading data:', error);
+                document.getElementById('container').innerHTML = '<p>Error loading data. Please try again later.</p>';
+            }
+        }
+
+        // 页面加载完成后预加载 index.html
+        window.addEventListener('load', () => {
+            const link = document.createElement('link');
+            link.rel = 'prefetch';
+            link.href = 'index.html';
+            document.head.appendChild(link);
+        });
+
+        // 加载数据并定期刷新
+        loadData();
+        setInterval(loadData, 5000);
+    </script>
+</body>
+</html>
