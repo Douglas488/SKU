@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Coleta</title>
     <!-- 预加载 index.html -->
-    <link rel="prefetch" href="index.html">
+    <link rel="prefetch" href="/SKU/index.html">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
@@ -227,7 +227,7 @@
 </head>
 <body>
     <!-- 修改导航按钮 -->
-    <a href="index.html" class="nav-button" id="navButton" onclick="handleNavigation(event)">
+    <a href="/SKU/index.html" class="nav-button" id="navButton" onclick="handleNavigation(event)">
         Codigo
     </a>
 
@@ -245,7 +245,7 @@
             // 使用 requestAnimationFrame 确保动画效果显示
             requestAnimationFrame(() => {
                 setTimeout(() => {
-                    window.location.href = 'index.html';
+                    window.location.href = '/SKU/index.html';
                 }, 100);
             });
         }
@@ -253,7 +253,7 @@
         // 原有的数据加载函数
         async function loadData() {
             try {
-                const response = await fetch('data01.txt');
+                const response = await fetch('/SKU/data01.txt');
                 const text = await response.text();
                 const lines = text.trim().split('\n');
                 
@@ -318,7 +318,7 @@
         window.addEventListener('load', () => {
             const link = document.createElement('link');
             link.rel = 'prefetch';
-            link.href = 'index.html';
+            link.href = '/SKU/index.html';
             document.head.appendChild(link);
         });
 
